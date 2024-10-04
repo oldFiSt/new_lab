@@ -63,7 +63,8 @@ jobs:
       - name: Debug - List contents of build directory
         run: ls -l ./build
 
-      - name: Check if package exists
+      # Проверка существования пакета
+      - name: Check if Linux package exists
         run: |
           if [ -f "./build/FilterProject-0.1.0-Linux.sh" ]; then
             echo "Linux package exists."
