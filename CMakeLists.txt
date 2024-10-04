@@ -20,8 +20,15 @@ target_link_libraries(test_ip_filter PRIVATE ${Boost_LIBRARIES} ip_filter)
 enable_testing()
 add_test(NAME test_ip_filter COMMAND test_ip_filter)
 
-# Включение CPack для создания пакетов
-include(CPack)
+# Копирование ресурсов (если необходимо)
+set(RESOURCE_FILES 
+    resources/ic.icns 
+    # resources/info.plist  # Закомментируйте эту строку, если файл не нужен
+)
+
+foreach(RESOURCE ${RESOURCE_FILES})
+    configure_file(${RESOURCE} ${CMAKE_BINARY_DIR}/${RESOURCE} COPYONLY)
+endforeach()
 
 set(CPACK_PACKAGE_NAME "ip_filter")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
