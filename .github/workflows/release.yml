@@ -1,4 +1,4 @@
-name: C++ CI - macOS
+name: C++ CI
 
 on:
   push:
@@ -10,9 +10,9 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    runs-on: macos-latest
-    timeout-minutes: 60
+  build-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60  # Увеличьте время выполнения, если это необходимо
 
     steps:
       - name: Checkout repository
@@ -21,15 +21,20 @@ jobs:
           submodules: true
 
       - name: Debug - Start
-        run: echo "Starting the job"
+        run: echo "Starting the job for Linux"
 
-      - name: Install dependencies on macOS
+      - name: Install dependencies
         run: |
-          brew update
-          brew install boost cmake open-mpi
+          sudo apt-get update
+          sudo apt-get install -y \
+            libboost-all-dev \
+            cmake \
+            openmpi-bin \
+            libopenmpi-dev
 
+      # Отладка перед сборкой
       - name: Debug - Post install
-        run: echo "Dependencies installed"
+        run: echo "Dependencies installed for Linux"
 
       - name: Create build directory
         run: mkdir -p build
@@ -49,44 +54,93 @@ jobs:
           cd build
           cmake --build . --target test
 
-      - name: Create package for macOS
+      - name: Create package
         run: |
           cd build
           cmake --build . --target package
-          ls -l ./  # Вывод списка файлов в текущей директории после создания пакета
 
-      # Проверка существования пакета для macOS 
-      - name: Check if macOS package exists 
-        run: | 
-          if [ -f "./build/IFilterProject-0.1.0-Darwin.dmg" ]; then 
-            echo "macOS package exists." 
-          else 
-            echo "macOS package does not exist." 
-            exit 1 
-          fi 
+      # Отладка перед проверкой существования пакета
+      - name: Debug - List contents of build directory after package creation
+        run: ls -l ./build
 
-      # Создание Release для macOS 
-      - name: Create Release for macOS 
-        id: create_release_macos 
-        uses: actions/create-release@v1 
+      # Проверка существования пакета для Linux
+      - name: Check if Linux package exists
+        run: |
+          if [ -f "./build/FilterProject-0.1.0-Linux.sh" ]; then  # Убедитесь, что имя файла правильное
+            echo "Linux package exists."
+          else
+            echo "Linux package does not exist."
+            exit 1
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-           tag_name: "release-macos-${{ github.run_number }}" 
-           release_name: "Release macOS ${{ github.run_number }}" 
-           draft: false 
-           prerelease: false 
+          tag_name: "release-${{ github.run_number }}"
+          release_name: "Release ${{ github.run_number }}"
+          draft: false
+          prerelease: false
 
-      # Загрузка артефактов для macOS 
-      - name: Upload Release Asset (macOS) 
-        uses: actions/upload-release-asset@v1 
+      # Отладка перед загрузкой ассета
+      - name: Debug - List contents of build directory before upload
+        run: ls -l ./build
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release_macos.outputs.upload_url }} 
-          asset_path: ./build/IFilterProject-0.1.0-Darwin.dmg  
-          asset_name: IFilterProject-0.1.0-Darwin.dmg  
-          asset_content_type: application/x-apple-diskimage 
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/FilterProject-0.1.0-Linux.sh  # Убедитесь, что путь правильный для созданного пакета 
+          asset_name: FilterProject-0.1.0-Linux.sh 
+          asset_content_type: application/x-sh
 
-      - name: Debug - End  
-        run: echo "Ending the job"
+      - name: Debug - End
+        run: echo "Ending the job for Linux"
+      
+      - name: Debug - List all files in build directory at the end of the job
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "List of files in build directory:"
+          ls -la ./build
+
+  build-mac:
+    runs-on: macos-latest
+    timeout-minutes: 60  # Увеличьте время выполнения, если это необходимо
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Debug - Start
+        run: echo "Starting the job for macOS"
+
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install \
+            boost \
+            cmake \
+            openmpi
+
+      # Отладка перед сборкой
+      - name: Debug - Post install
+        run: echo "Dependencies installed for macOS"
+
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: Configure with CMake
+        run: |
+          cd build
+          cmake .. -DPATCH_VERSION=${{ github.run_number }}
+          
+      - name: Build the project
+        run: |
+          cd build
