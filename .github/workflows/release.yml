@@ -1,4 +1,4 @@
-name: 'C++ CI'
+name: C++ CI
 
 on:
   push:
@@ -39,11 +39,11 @@ jobs:
 
       - name: Build the project
         run: |
-          cmake --build . || exit 1
+          cmake --build .
 
       - name: Run tests
         run: |
-          cmake --build . --target test || exit 1
+          cmake --build . --target test
 
       - name: Create package
         run: |
