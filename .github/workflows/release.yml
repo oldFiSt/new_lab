@@ -1,4 +1,4 @@
-name: C++ CI
+name: C++ CI - macOS
 
 on:
   push:
@@ -11,8 +11,8 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60  # Увеличьте время выполнения, если это необходимо
+    runs-on: macos-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
@@ -23,16 +23,11 @@ jobs:
       - name: Debug - Start
         run: echo "Starting the job"
 
-      - name: Install dependencies
+      - name: Install dependencies on macOS
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libboost-all-dev \
-            cmake \
-            openmpi-bin \
-            libopenmpi-dev
+          brew update
+          brew install boost cmake open-mpi
 
-      # Отладка перед сборкой
       - name: Debug - Post install
         run: echo "Dependencies installed"
 
@@ -54,56 +49,43 @@ jobs:
           cd build
           cmake --build . --target test
 
-      - name: Create package
+      - name: Create package for macOS
         run: |
           cd build
           cmake --build . --target package
 
-      # Отладка перед проверкой существования пакета
-      - name: Debug - List contents of build directory after package creation
-        run: ls -l ./build
+      # Проверка существования пакета для macOS 
+      - name: Check if macOS package exists 
+        run: | 
+          if [ -f "./IFilterProject-0.1.0-Darwin.dmg" ]; then 
+            echo "macOS package exists." 
+          else 
+            echo "macOS package does not exist." 
+            exit 1 
+          fi 
 
-      # Проверка существования пакета для Linux
-      - name: Check if Linux package exists
-        run: |
-          if [ -f "./build/IFilterProject-0.1.0-Linux.sh" ]; then  # Убедитесь, что имя файла правильное
-            echo "Linux package exists."
-          else
-            echo "Linux package does not exist."
-            exit 1
-          fi
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      # Создание Release для macOS 
+      - name: Create Release for macOS 
+        id: create_release_macos 
+        uses: actions/create-release@v1 
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: "release-${{ github.run_number }}"
-          release_name: "Release ${{ github.run_number }}"
-          draft: false
-          prerelease: false
+           tag_name: "release-macos-${{ github.run_number }}" 
+           release_name: "Release macOS ${{ github.run_number }}" 
+           draft: false 
+           prerelease: false 
 
-      # Отладка перед загрузкой ассета
-      - name: Debug - List contents of build directory before upload
-        run: ls -l ./build
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+      # Загрузка артефактов для macOS 
+      - name: Upload Release Asset (macOS) 
+        uses: actions/upload-release-asset@v1 
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/IFilterProject-0.1.0-Linux.sh  # Убедитесь, что путь правильный для созданного пакета 
-          asset_name: IFilterProject-0.1.0-Linux.sh 
-          asset_content_type: application/x-sh
+          upload_url: ${{ steps.create_release_macos.outputs.upload_url }} 
+          asset_path: ./build/IFilterProject-0.1.0-Darwin.dmg  
+          asset_name: IFilterProject-0.1.0-Darwin.dmg  
+          asset_content_type: application/x-apple-diskimage 
 
-      - name: Debug - End
+      - name: Debug - End  
         run: echo "Ending the job"
-      
-      - name: Debug - List all files in build directory at the end of the job
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "List of files in build directory:"
-          ls -la ./build
