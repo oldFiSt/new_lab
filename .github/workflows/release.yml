@@ -99,3 +99,10 @@ jobs:
 
       - name: Debug - End
         run: echo "Ending the job"
+      
+      - name: Debug - List all files in build directory
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "List of files in build directory:"
+          ls -la ./build
