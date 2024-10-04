@@ -86,8 +86,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_linux.outputs.upload_url }}
-          asset_path: ./IFilterProject-0.1.0-Linux.sh  # Убедитесь, что путь правильный для созданного пакета 
+          asset_path: ./build/IFilterProject-0.1.0-Linux.sh  # Убедитесь, что путь правильный для созданного пакета 
           asset_name: IFilterProject-0.1.0-Linux.sh 
           asset_content_type: application/x-sh
 
-      # Создание релиза для macOS (аналогично)
