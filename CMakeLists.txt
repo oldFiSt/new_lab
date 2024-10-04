@@ -1,19 +1,45 @@
-cmake_minimum_required(VERSION 3.14)
-project(IPFilterProject VERSION 1.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.10)
 
-# Укажите стандарт C++
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Установка имени проекта и версии
+project(PrintIPTests VERSION 0.1.0)
 
-# Найдите библиотеку Boost
-find_package(Boost REQUIRED)
+# Найти Boost для тестирования
+find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
-# Добавляем исполняемый файл для основной программы
-add_executable(ip_filter ip_filter.cpp)
+# Добавление исполняемых файлов и библиотек
+add_executable(test_ip_filter test_ip_filter.cpp) # Исполняемый файл для тестов
 
-# Добавляем исполняемый файл для тестов
-add_executable(test_ip_filter test_ip_filter.cpp)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-subsystem,console")
-# Линкуем Boost с исполняемым файлом тестов
-target_link_libraries(test_ip_filter Boost::boost)
-configure_file(ip_filter.tsv ${CMAKE_CURRENT_BINARY_DIR}/ip_filter.tsv COPYONLY)
+
+# Настройки для тестов
+target_include_directories(test_ip_filter
+    PRIVATE ${Boost_INCLUDE_DIRS}
+)
+target_link_libraries(test_ip_filter
+    PRIVATE ${Boost_LIBRARIES}
+    helloworld
+)
+
+
+# Настройки компилятора в зависимости от платформы
+if (MSVC)
+    target_compile_options(test_ip_filter PRIVATE /W4)
+else ()
+    target_compile_options(test_ip_filter PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
+
+# Установка для macOS и Linux (если необходимо)
+if (APPLE)
+    set(CPACK_GENERATOR "Bundle")
+elseif (UNIX)
+    set(CPACK_GENERATOR "DEB")
+endif()
+
+set(CPACK_PACKAGE_CONTACT example@example.com)
+
+include(CPack)
+
+# Настройка тестов
+enable_testing()
+add_test(NAME test_version COMMAND test_ip_filter) # Добавляем тесты
+
+message("Configured PROJECT_VERSION: ${PROJECT_VERSION}")
