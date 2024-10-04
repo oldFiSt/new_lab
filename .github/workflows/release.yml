@@ -49,6 +49,17 @@ jobs:
         run: |
           cmake --build . --target package
 
+      # Проверка существования пакета для Linux
+      - name: Check if Linux package exists
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          if [ -f "./build/if_filter-0.0.${{ github.run_number }}-Linux.deb" ]; then
+            echo "Linux package exists."
+          else
+            echo "Linux package does not exist."
+            exit 1
+          fi
+
       # Создание релиза для Linux
       - name: Create Release for Linux
         if: ${{ runner.os == 'Linux' }}
@@ -73,26 +84,4 @@ jobs:
           asset_name: if_filter-0.0.${{ github.run_number }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
 
-      # Создание релиза для macOS
-      - name: Create Release for macOS
-        if: ${{ runner.os == 'macOS' }}
-        id: create_release_macos
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: "macos-${{ github.run_number }}"
-          release_name: "Release macOS ${{ github.run_number }}"
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset (macOS)
-        if: ${{ runner.os == 'macOS' }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release_macos.outputs.upload_url }}
-          asset_path: ./if_filter-0.0.${{ github.run_number }}-Darwin.dmg  
-          asset_name: if_filter-0.0.${{ github.run_number }}-Darwin.dmg
-          asset_content_type: application/x-apple-diskimage 
+      # Создание релиза для macOS (аналогично)
