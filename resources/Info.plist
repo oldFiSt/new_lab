@@ -3,12 +3,10 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>YourAppName</string>  <!-- Замените на имя вашего приложения -->
+    <string>YourAppName</string>
     <key>CFBundleVersion</key>
-    <string>${PROJECT_VERSION}</string>
+    <string>1.0</string>
     <key>CFBundleIdentifier</key>
-    <string>com.yourcompany.yourapp</string>  <!-- Замените на уникальный идентификатор вашего приложения -->
-    <key>CFBundleExecutable</key>
-    <string>YourExecutableName</string>  <!-- Замените на имя исполняемого файла -->
+    <string>com.yourcompany.yourapp</string>
 </dict>
 </plist>
