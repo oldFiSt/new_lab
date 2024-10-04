@@ -33,28 +33,32 @@ jobs:
           brew update
           brew install boost cmake
 
-      - name: Configure with CMake
+      - name: Create build directory and configure with CMake
         run: |
-          cmake . -DPATCH_VERSION=${{ github.run_number }}
+          mkdir -p build
+          cd build
+          cmake .. -DPATCH_VERSION=${{ github.run_number }}
 
       - name: Build the project
         run: |
+          cd build
           cmake --build .
 
       - name: Run tests
         run: |
+          cd build
           cmake --build . --target test
 
       - name: Create package
         run: |
+          cd build
           cmake --build . --target package
-          ls -l ./build  # Вывод списка файлов в директории сборки
 
       # Проверка существования пакета для Linux
       - name: Check if Linux package exists
         if: ${{ runner.os == 'Linux' }}
         run: |
-          if [ -f "./build/if_filter-0.0.${{ github.run_number }}-Linux.deb" ]; then
+          if [ -f "./IFilterProject-0.1.0-Linux.sh" ]; then  # Убедитесь, что имя файла правильное
             echo "Linux package exists."
           else
             echo "Linux package does not exist."
@@ -81,8 +85,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_linux.outputs.upload_url }}
-          asset_path: ./build/if_filter-0.0.${{ github.run_number }}-Linux.deb  
-          asset_name: if_filter-0.0.${{ github.run_number }}-Linux.deb
-          asset_content_type: application/vnd.debian.binary-package
+          asset_path: ./IFilterProject-0.1.0-Linux.sh  # Убедитесь, что путь правильный для созданного пакета 
+          asset_name: IFilterProject-0.1.0-Linux.sh 
+          asset_content_type: application/x-sh
 
       # Создание релиза для macOS (аналогично)
