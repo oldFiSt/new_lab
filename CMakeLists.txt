@@ -27,11 +27,11 @@ target_include_directories(test_ip_filter
 )
 target_link_libraries(test_ip_filter
     PRIVATE ${Boost_LIBRARIES}
-    if_filter
+    ip_filter
 )
 
 # Линковка исполняемого файла с библиотекой
-target_link_libraries(test_ip_filter PRIVATE if_filter)
+target_link_libraries(test_ip_filter PRIVATE ip_filter)
 
 # Установка ресурсов (иконки и plist)
 set(RESOURCE_FILES 
