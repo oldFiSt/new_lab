@@ -53,11 +53,12 @@ jobs:
         run: |
           cd build
           cmake --build . --target package
+          ls -l ./  # Вывод списка файлов в текущей директории после создания пакета
 
       # Проверка существования пакета для macOS 
       - name: Check if macOS package exists 
         run: | 
-          if [ -f "./IFilterProject-0.1.0-Darwin.dmg" ]; then 
+          if [ -f "./build/IFilterProject-0.1.0-Darwin.dmg" ]; then 
             echo "macOS package exists." 
           else 
             echo "macOS package does not exist." 
