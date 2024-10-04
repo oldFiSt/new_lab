@@ -89,4 +89,36 @@ jobs:
           asset_name: IFilterProject-0.1.0-Linux.sh 
           asset_content_type: application/x-sh
 
-      # Создание релиза для macOS (аналогично)
+      # Создание релиза для macOS
+      - name: Check if macOS package exists
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          if [ -f "./IFilterProject-0.1.0-Darwin.dmg" ]; then  # Убедитесь, что имя файла правильное для macOS
+            echo "macOS package exists."
+          else
+            echo "macOS package does not exist."
+            exit 1
+          fi
+
+      - name: Create Release for macOS
+        if: ${{ runner.os == 'macOS' }}
+        id: create_release_macos
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "macos-${{ github.run_number }}"
+          release_name: "Release macOS ${{ github.run_number }}"
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset (macOS)
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release_macos.outputs.upload_url }}
+          asset_path: ./IFilterProject-0.1.0-Darwin.dmg  # Убедитесь, что путь правильный для созданного пакета 
+          asset_name: IFilterProject-0.1.0-Darwin.dmg 
+          asset_content_type: application/x-apple-diskimage 
