@@ -69,7 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_linux.outputs.upload_url }}
-          asset_path: ./if_filter-0.0.${{ github.run_number }}-Linux.deb  
+          asset_path: ./build/if_filter-0.0.${{ github.run_number }}-Linux.deb  
           asset_name: if_filter-0.0.${{ github.run_number }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
 
