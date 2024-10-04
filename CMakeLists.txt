@@ -42,10 +42,15 @@ include(CPack)
 # Настройки для CPack
 set(CPACK_PACKAGE_NAME "ip_filter")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION "A description of your package.")
+set(CPACK_PACKAGE_LICENSE "MIT")  # Замените на вашу лицензию
 set(CPACK_GENERATOR "DEB")  # Или "Bundle" для macOS
 
 # Установка файлов в пакет (если необходимо)
 install(TARGETS ip_filter DESTINATION bin)
 install(TARGETS test_ip_filter DESTINATION bin)  # Если хотите включить тесты в пакет
+
+# Установка ресурсов в пакет (если необходимо)
+install(FILES ${RESOURCE_FILES} DESTINATION resources)
 
 message("Configured PROJECT_VERSION: ${PROJECT_VERSION}")
