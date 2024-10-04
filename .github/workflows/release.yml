@@ -59,7 +59,7 @@ jobs:
       - name: Check if Linux package exists
         if: ${{ runner.os == 'Linux' }}
         run: |
-          if [ -f "./IFilterProject-0.1.0-Linux.sh" ]; then  # Убедитесь, что имя файла правильное
+          if [ -f "./build/FilterProject-0.1.0-Linux.sh" ]; then  # Убедитесь, что имя файла правильное и путь правильный
             echo "Linux package exists."
           else
             echo "Linux package does not exist."
@@ -78,17 +78,7 @@ jobs:
           release_name: "Release Linux ${{ github.run_number }}"
           draft: false
           prerelease: false
-      
-      - name: Check if Linux package exists
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          if [ -f "./build/FilterProject-0.1.0-Linux.sh" ]; then  # Убедитесь, что путь правильный
-            echo "Linux package exists."
-          else
-            echo "Linux package does not exist."
-            exit 1
-          fi
-          
+
       - name: Upload Release Asset (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-release-asset@v1
@@ -96,7 +86,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_linux.outputs.upload_url }}
-          asset_path: ./build/IFilterProject-0.1.0-Linux.sh  # Убедитесь, что путь правильный для созданного пакета 
-          asset_name: IFilterProject-0.1.0-Linux.sh 
+          asset_path: ./build/FilterProject-0.1.0-Linux.sh  # Убедитесь, что путь правильный для созданного пакета 
+          asset_name: FilterProject-0.1.0-Linux.sh 
           asset_content_type: application/x-sh
-
