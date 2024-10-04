@@ -53,7 +53,12 @@ jobs:
         run: |
           cd build
           cmake --build . --target package
-          ls -l ./  # Вывод списка файлов в текущей директории
+          ls -l ./build  # Вывод списка файлов в директории build
+
+      # Отладка перед проверкой существования пакета
+      - name: Debug - List contents of build directory
+        run: |
+          ls -l ./build
 
       # Проверка существования пакета для Linux
       - name: Check if Linux package exists
@@ -78,6 +83,11 @@ jobs:
           release_name: "Release Linux ${{ github.run_number }}"
           draft: false
           prerelease: false
+
+      # Еще один шаг отладки перед загрузкой ассета
+      - name: Debug - List contents of build directory before upload
+        run: |
+          ls -l ./build
 
       - name: Upload Release Asset (Linux)
         if: ${{ runner.os == 'Linux' }}
