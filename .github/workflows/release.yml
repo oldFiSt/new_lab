@@ -159,37 +159,48 @@ jobs:
         run : ls –l ./build 
 
        # Проверка существования пакета для macOS 
-      - name : Check if macOS package exists 
-        run : | 
-           if [ –f "./build/IFilterProject-0.1.0-Darwin.dmg" ]; then 
-             echo "macOS package exists." 
-           else 
-             echo "macOS package does not exist." 
-             exit 1 
-           fi 
-
-       # Создание Release для macOS 
-      - name : Create Release for macOS 
-        id : create_release_macos 
-        uses : actions/create-release@v1 
-        env : 
-           GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }} 
-        with : 
-          tag_name : "release-macos-${{ github.run_number }}" 
-          release_name : "Release macOS ${{ github.run_number }}" 
-          draft : false 
-          prerelease : false 
-
-       # Загрузка артефактов для macOS 
-      - name : Upload Release Asset (macOS) 
-        uses : actions/upload-release-asset@v1 
-        env :
-           GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }} 
-        with :
-          upload_url : ${{ steps.create_release_macos.outputs.upload_url }} 
-          asset_path : ./build/IFilterProject-0.1.0-Darwin.dmg  
-          asset_name : IFilterProject-0.1.0-Darwin.dmg  
-          asset_content_type : application/x-apple-diskimage 
-
-      - name : Debug – End  
-        run : echo “Ending the job for macOS”  
+      - name: Create package for macOS
+        run: |
+         cd build
+         cmake --build . --target package
+ 
+     # Отладка перед проверкой существования пакета для macOS
+      - name: Debug – List contents of build directory after package creation
+        run: ls -l ./build
+          
+      # Проверка существования пакета для macOS
+      - name: Check if macOS package exists
+        run: |
+          if [ -f "./build/IFilterProject-0.1.0-Darwin.dmg" ]; then
+            echo "macOS package exists."
+          else
+            echo "macOS package does not exist."
+            exit 1
+          fi
+          
+      # Создание Release для macOS
+      - name: Create Release for macOS
+        id: create_release_macos
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "release-macos-${{ github.run_number }}"
+          release_name: "Release macOS ${{ github.run_number }}"
+          draft: false
+          prerelease: false
+        
+      # Загрузка артефактов для macOS
+      - name: Upload Release Asset (macOS)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release_macos.outputs.upload_url }}
+          asset_path: ./build/IFilterProject-0.1.0-Darwin.dmg
+          asset_name: IFilterProject-0.1.0-Darwin.dmg
+          asset_content_type: application/x-apple-diskimage
+        
+      - name: Debug – End
+        run: echo "Ending the job for macOS"
+  
