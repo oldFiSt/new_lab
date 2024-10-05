@@ -29,7 +29,7 @@ add_test(NAME test_ip_filter COMMAND test_ip_filter)
 # Копирование ресурсов (если необходимо)
 set(RESOURCE_FILES 
     resources/ic.icns 
-    # resources/info.plist  # Закомментируйте эту строку, если файл не нужен
+    
 )
 
 foreach(RESOURCE ${RESOURCE_FILES})
@@ -43,12 +43,12 @@ include(CPack)
 set(CPACK_PACKAGE_NAME "ip_filter")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION "A description of your package.")
-set(CPACK_PACKAGE_LICENSE "MIT")  # Замените на вашу лицензию
-set(CPACK_GENERATOR "DEB")  # Или "Bundle" для macOS
+set(CPACK_PACKAGE_LICENSE "MIT")
+set(CPACK_GENERATOR "DEB")
 
 # Установка файлов в пакет (если необходимо)
 install(TARGETS ip_filter DESTINATION bin)
-install(TARGETS test_ip_filter DESTINATION bin)  # Если хотите включить тесты в пакет
+install(TARGETS test_ip_filter DESTINATION bin)  
 
 # Установка ресурсов в пакет (если необходимо)
 install(FILES ${RESOURCE_FILES} DESTINATION resources)
