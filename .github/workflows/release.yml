@@ -152,7 +152,8 @@ jobs:
       - name : Create package for macOS 
         run : | 
            cd build 
-           cmake --build . --target package
+           cmake --build . --target package 
+
        # Отладка перед проверкой существования пакета для macOS 
       - name : Debug – List contents of build directory after package creation 
         run : ls –l ./build 
@@ -172,7 +173,7 @@ jobs:
         id : create_release_macos 
         uses : actions/create-release@v1 
         env : 
-          GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }} 
+           GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }} 
         with : 
           tag_name : "release-macos-${{ github.run_number }}" 
           release_name : "Release macOS ${{ github.run_number }}" 
@@ -183,7 +184,7 @@ jobs:
       - name : Upload Release Asset (macOS) 
         uses : actions/upload-release-asset@v1 
         env :
-          GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }} 
+           GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }} 
         with :
           upload_url : ${{ steps.create_release_macos.outputs.upload_url }} 
           asset_path : ./build/IFilterProject-0.1.0-Darwin.dmg  
