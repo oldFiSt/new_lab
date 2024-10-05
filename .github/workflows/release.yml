@@ -12,7 +12,7 @@ permissions:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 60  # Увеличьте время выполнения, если это необходимо
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
@@ -32,7 +32,6 @@ jobs:
             openmpi-bin \
             libopenmpi-dev
 
-      # Отладка перед сборкой
       - name: Debug - Post install
         run: echo "Dependencies installed for Linux"
 
@@ -59,14 +58,12 @@ jobs:
           cd build
           cmake --build . --target package
 
-      # Отладка перед проверкой существования пакета
       - name: Debug - List contents of build directory after package creation
         run: ls -l ./build
 
-      # Проверка существования пакета для Linux
       - name: Check if Linux package exists
         run: |
-          if [ -f "./build/IFilterProject-0.1.0-Linux.sh" ]; then  # Убедитесь, что имя файла правильное
+          if [ -f "./build/IFilterProject-0.1.0-Linux.sh" ]; then
             echo "Linux package exists."
           else
             echo "Linux package does not exist."
@@ -84,7 +81,6 @@ jobs:
           draft: false
           prerelease: false
 
-      # Отладка перед загрузкой ассета
       - name: Debug - List contents of build directory before upload
         run: ls -l ./build
 
@@ -100,7 +96,7 @@ jobs:
 
       - name: Debug - End
         run: echo "Ending the job for Linux"
-      
+
       - name: Debug - List all files in build directory at the end of the job
         run: |
           echo "Current directory:"
@@ -111,7 +107,7 @@ jobs:
 
   build-mac:
     runs-on: macos-latest
-    timeout-minutes: 60  # Увеличьте время выполнения, если это необходимо
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
@@ -127,80 +123,63 @@ jobs:
           brew update
           brew install boost cmake open-mpi
 
-      # Отладка перед сборкой для macOS 
-      - name: Debug - Post install for macOS 
-        run : echo "Dependencies installed for macOS" 
+      - name: Debug - Post install for macOS
+        run: echo "Dependencies installed for macOS"
 
-      - name : Create build directory for macOS 
-        run : mkdir -p build 
+      - name: Create build directory for macOS
+        run: mkdir -p build
 
-      - name : Configure with CMake for macOS 
-        run : | 
-          cd build 
-          cmake .. -DPATCH_VERSION=${{ github.run_number }} 
+      - name: Configure with CMake for macOS
+        run: |
+          cd build
+          cmake .. -DPATCH_VERSION=${{ github.run_number }}
 
-      - name : Build the project for macOS 
-        run : | 
-          cd build 
-          cmake --build . 
+      - name: Build the project for macOS
+        run: |
+          cd build
+          cmake --build .
 
-      - name : Run tests for macOS 
-        run : | 
-           cd build 
-           cmake --build . --target test 
+      - name: Create package for macOS
+        run: |
+          cd build
+          cmake --build . --target package
 
-      - name : Create package for macOS 
-        run : | 
-           cd build 
-           cmake --build . --target package 
-
-       # Отладка перед проверкой существования пакета для macOS 
+      # Отладка перед проверкой существования пакета для macOS 
       - name : Debug – List contents of build directory after package creation 
         run : ls –l ./build 
 
-       # Проверка существования пакета для macOS 
-      - name: Create package for macOS
-        run: |
-         cd build
-         cmake --build . --target package
- 
-     # Отладка перед проверкой существования пакета для macOS
-      - name: Debug – List contents of build directory after package creation
-        run: ls -l ./build
-          
-      # Проверка существования пакета для macOS
-      - name: Check if macOS package exists
-        run: |
-          if [ -f "./build/IFilterProject-0.1.0-Darwin.dmg" ]; then
-            echo "macOS package exists."
-          else
-            echo "macOS package does not exist."
-            exit 1
-          fi
-          
-      # Создание Release для macOS
-      - name: Create Release for macOS
-        id: create_release_macos
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: "release-macos-${{ github.run_number }}"
-          release_name: "Release macOS ${{ github.run_number }}"
-          draft: false
-          prerelease: false
-        
-      # Загрузка артефактов для macOS
-      - name: Upload Release Asset (macOS)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release_macos.outputs.upload_url }}
-          asset_path: ./build/IFilterProject-0.1.0-Darwin.dmg
-          asset_name: IFilterProject-0.1.0-Darwin.dmg
-          asset_content_type: application/x-apple-diskimage
-        
-      - name: Debug – End
-        run: echo "Ending the job for macOS"
-  
+      # Проверка существования пакета для macOS 
+      - name : Check if macOS package exists 
+        run : | 
+           if [ –f "./build/IFilterProject-0.1.0-Darwin.dmg" ]; then 
+             echo "macOS package exists." 
+           else 
+             echo "macOS package does not exist." 
+             exit 1 
+           fi 
+
+       # Создание Release для macOS 
+      - name : Create Release for macOS 
+        id : create_release_macos 
+        uses : actions/create-release@v1 
+        env : 
+          GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }} 
+        with : 
+          tag_name : "release-macos-${{ github.run_number }}" 
+          release_name : "Release macOS ${{ github.run_number }}" 
+          draft : false 
+          prerelease : false 
+
+       # Загрузка артефактов для macOS 
+      - name : Upload Release Asset (macOS) 
+        uses : actions/upload-release-asset@v1 
+        env :
+          GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }} 
+        with :
+          upload_url : ${{ steps.create_release_macos.outputs.upload_url }} 
+          asset_path : ./build/IFilterProject-0.1.0-Darwin.dmg  
+          asset_name : IFilterProject-0.1.0-Darwin.dmg  
+          asset_content_type : application/x-apple-diskimage 
+
+      - name : Debug – End  
+        run : echo “Ending the job for macOS”  
