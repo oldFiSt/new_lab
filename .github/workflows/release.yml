@@ -12,10 +12,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60  # Увеличьте время выполнения, если это необходимо
+    timeout-minutes: 60  # Для решения ошибки с Check if
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository #Получение кода из репозитория
         uses: actions/checkout@v3
         with:
           submodules: true
@@ -23,11 +23,11 @@ jobs:
       - name: Debug - Start
         run: echo "Starting the job"
 
-      - name: Install dependencies
+      - name: Install dependencies # Установка зависимостей 
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            libboost-all-dev \
+            libboost-all-dev \ #Библиотека BOOST
             cmake \
             openmpi-bin \
             libopenmpi-dev
@@ -36,7 +36,7 @@ jobs:
       - name: Debug - Post install
         run: echo "Dependencies installed"
 
-      - name: Create build directory
+      - name: Create build directory # Директория сборки
         run: mkdir -p build
 
       - name: Configure with CMake
@@ -64,7 +64,7 @@ jobs:
         run: ls -l ./build
 
       # Проверка существования пакета для Linux
-      - name: Check if Linux package exists
+      - name: Check if Linux package exists //  Шаг для проверки существования созданного пакета 
         run: |
           if [ -f "./build/IFilterProject-0.1.0-Linux.sh" ]; then  # Убедитесь, что имя файла правильное
             echo "Linux package exists."
@@ -94,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/IFilterProject-0.1.0-Linux.sh  # Убедитесь, что путь правильный для созданного пакета 
+          asset_path: ./build/IFilterProject-0.1.0-Linux.sh  # Путь к созданному пакету 
           asset_name: IFilterProject-0.1.0-Linux.sh 
           asset_content_type: application/x-sh
 
